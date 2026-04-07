@@ -1,0 +1,5 @@
+{
+  "name": "psl-batiment-webhook",
+  "version": "1.0.0",
+  "description": "Webhook PSL Bâtiment — Vapi + Supabase + Brevo"
+}
