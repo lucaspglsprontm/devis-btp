@@ -1,8 +1,10 @@
 const SUPABASE_URL = 'https://hkhhonbhrsxinixughhw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_gtebuA6Z4Q6rApFAUQVFWg_vgc0Rykx';
-const TWILIO_SID = 'AC9d47f4b52de13f8ddacb4a2534607f66';
-const TWILIO_TOKEN = '87eb8c4d9294712c9ecb2e4a9a8fbe77';
-const TWILIO_NUMBER = '+17126286803';
+const OVH_AK = '95b778c4c41e3668';
+const OVH_AS = 'b09b12019f0bf89ce6ad6aca74920d45';
+const OVH_CK = '747e1be59640e2174807f9dad7bd12d6';
+const OVH_SERVICE = 'sms-lq44011-1';
+const OVH_SENDER = 'PSLBatiment';
 
 async function getPrix(corpsMetier, description) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/prestations?actif=eq.true&order=confiance.desc&limit=50`, {
@@ -47,23 +49,39 @@ function calculerFourchette(prestations, quantite, region) {
 
 async function envoyerSMS(telephone, message) {
   const telFormate = telephone.replace(/\s/g, '').replace(/^0/, '+33');
-  const credentials = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-  const body = new URLSearchParams({
-    From: TWILIO_NUMBER,
-    To: telFormate,
-    Body: message
+  
+  const now = Math.round(Date.now() / 1000);
+  const body = JSON.stringify({
+    message,
+    receivers: [telFormate],
+    sender: OVH_SENDER,
+    noStopClause: false
   });
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+
+  const toSign = `${OVH_AS}+${OVH_CK}+GET+https://eu.api.ovh.com/1.0/sms/${OVH_SERVICE}/jobs+${body}+${now}`;
+
+  const url = `https://eu.api.ovh.com/1.0/sms/${OVH_SERVICE}/jobs`;
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Basic ${credentials}`,
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json',
+      'X-Ovh-Application': OVH_AK,
+      'X-Ovh-Consumer': OVH_CK,
+      'X-Ovh-Timestamp': now.toString(),
+      'X-Ovh-Signature': await sha1(toSign)
     },
-    body: body.toString()
+    body
   });
   const data = await res.json();
-  console.log('Twilio response:', JSON.stringify(data));
+  console.log('OVH SMS response:', JSON.stringify(data));
   return res.ok;
+}
+
+async function sha1(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hash = await crypto.subtle.digest('SHA-1', data);
+  return '$1$' + Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function sauvegarderAppel(data) {
