@@ -1,7 +1,7 @@
 const SUPABASE_URL = 'https://hkhhonbhrsxinixughhw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_gtebuA6Z4Q6rApFAUQVFWg_vgc0Rykx';
 const TWILIO_SID = 'AC9d47f4b52de13f8ddacb4a2534607f66';
-const TWILIO_TOKEN = 'ae9fef8d46728d689534dc8504fb3ec8';
+const TWILIO_TOKEN = '87eb8c4d9294712c9ecb2e4a9a8fbe77';
 const TWILIO_NUMBER = '+17126286803';
 
 async function getPrix(corpsMetier, description) {
