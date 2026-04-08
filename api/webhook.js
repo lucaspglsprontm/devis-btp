@@ -4,7 +4,7 @@ const OVH_AK = 'abe2d11f2035e322';
 const OVH_AS = '1aca44215b5fd7bf6894cc033622c857';
 const OVH_CK = '06721f8650302a5a424472463c3394a0';
 const OVH_SERVICE = 'sms-lq44011-1';
-const OVH_SENDER = 'PSLBatiment';
+const OVH_SENDER = '38068';
 
 async function getPrix(corpsMetier, description) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/prestations?actif=eq.true&order=confiance.desc&limit=50`, {
