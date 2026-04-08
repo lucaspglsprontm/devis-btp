@@ -47,9 +47,16 @@ function calculerFourchette(prestations, quantite, region) {
   return { min: minTotal, max: maxTotal, confiance };
 }
 
+async function sha1Hex(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hash = await crypto.subtle.digest('SHA-1', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function envoyerSMS(telephone, message) {
   const telFormate = telephone.replace(/\s/g, '').replace(/^0/, '+33');
-  
+  const url = `https://eu.api.ovh.com/1.0/sms/${OVH_SERVICE}/jobs`;
   const now = Math.round(Date.now() / 1000);
   const body = JSON.stringify({
     message,
@@ -58,9 +65,9 @@ async function envoyerSMS(telephone, message) {
     noStopClause: false
   });
 
-  const toSign = `${OVH_AS}+${OVH_CK}+GET+https://eu.api.ovh.com/1.0/sms/${OVH_SERVICE}/jobs+${body}+${now}`;
+  const toSign = `${OVH_AS}+${OVH_CK}+POST+${url}+${body}+${now}`;
+  const signature = '$1$' + await sha1Hex(toSign);
 
-  const url = `https://eu.api.ovh.com/1.0/sms/${OVH_SERVICE}/jobs`;
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -68,20 +75,13 @@ async function envoyerSMS(telephone, message) {
       'X-Ovh-Application': OVH_AK,
       'X-Ovh-Consumer': OVH_CK,
       'X-Ovh-Timestamp': now.toString(),
-      'X-Ovh-Signature': await sha1(toSign)
+      'X-Ovh-Signature': signature
     },
     body
   });
   const data = await res.json();
   console.log('OVH SMS response:', JSON.stringify(data));
   return res.ok;
-}
-
-async function sha1(str) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(str);
-  const hash = await crypto.subtle.digest('SHA-1', data);
-  return '$1$' + Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function sauvegarderAppel(data) {
