@@ -1,8 +1,8 @@
 const SUPABASE_URL = 'https://hkhhonbhrsxinixughhw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_gtebuA6Z4Q6rApFAUQVFWg_vgc0Rykx';
-const OVH_AK = '95b778c4c41e3668';
-const OVH_AS = 'b09b12019f0bf89ce6ad6aca74920d45';
-const OVH_CK = '747e1be59640e2174807f9dad7bd12d6';
+const OVH_AK = 'abe2d11f2035e322';
+const OVH_AS = '1aca44215b5fd7bf6894cc033622c857';
+const OVH_CK = '06721f8650302a5a424472463c3394a0';
 const OVH_SERVICE = 'sms-lq44011-1';
 const OVH_SENDER = 'PSLBatiment';
 
